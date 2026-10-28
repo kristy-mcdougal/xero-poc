@@ -66,24 +66,25 @@ export function resolveDiscountSource(
   return { discount: null, parent: null };
 }
 
-/** Edit target for the PromoCopy component that holds banner/price/disclaimer templates. */
-export function promoCopyTarget(parent: EditTarget | null, discount: Discount | null): EditTarget | null {
-  if (!discount) return null;
-  const onDiscount = into(parent, "promotionalDiscount", discount.id);
-  return into(onDiscount, "promoCopy", discount.promoCopy?.id);
+/**
+ * Edit target for the banner/price/disclaimer templates.
+ * PromoCopy is a standalone model (referenced via PromotionalDiscount), so the
+ * click-to-edit root is the PromoCopy document itself — no component chain.
+ */
+export function promoCopyTarget(discount: Discount | null): EditTarget | null {
+  return root(discount?.promoCopy?.id);
 }
 
 export function resolveNavbar(region: Region, page?: Page | null) {
   return page?.settings?.navbar ?? region.navbar;
 }
 
-/** Edit target for the active navbar component (page settings override or region default). */
+/**
+ * Edit target for the active navbar (page settings override or region default).
+ * Navbar is a standalone model, so the root is the Navbar document itself.
+ */
 export function navbarTarget(region: Region, page?: Page | null): EditTarget | null {
-  if (page?.settings?.navbar) {
-    return into(into(root(page.id), "settings", page.settings.id), "navbar", page.settings.navbar.id);
-  }
-  if (region.navbar) return into(root(region.id), "navbar", region.navbar.id);
-  return null;
+  return root(resolveNavbar(region, page)?.id);
 }
 
 export function ctaHref(prefix: string, cta?: Cta | null) {

@@ -75,8 +75,8 @@ export default async function CatchAllPage({
   const locale = localeParam || region.contentLocale || "en";
 
   const post = rawPost ? localizedPost(rawPost, locale) : null;
-  const { discount, parent: discountParent } = resolveDiscountSource(region, page, rawPost);
-  const copyTarget = promoCopyTarget(discountParent, discount);
+  const { discount } = resolveDiscountSource(region, page, rawPost);
+  const copyTarget = promoCopyTarget(discount);
   const cta = resolveCta(site, region, parsed.path, page, rawPost);
   const publicUrl = publicPath(region.pathPrefix, parsed.path);
   const branding = getBranding(site);

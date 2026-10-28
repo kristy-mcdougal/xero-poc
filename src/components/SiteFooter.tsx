@@ -14,7 +14,8 @@ export function SiteFooter({
   brandTarget: EditTarget | null;
 }) {
   const footer = region.footer;
-  const footerTarget = into(root(region.id), "footer", footer?.id);
+  // Footer is a standalone model, so its fields are edited on the Footer document itself.
+  const footerTarget = root(footer?.id);
   const navBarColor = branding?.navBarColor?.hex || BRAND_FALLBACK.navBar;
   const logo = branding?.logo;
   return (
