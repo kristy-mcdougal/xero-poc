@@ -55,6 +55,22 @@ export type BlogPostListBlock = {
 
 export type PageBlock = BasicTextBlock | PlanBlock | BlogPostListBlock;
 
+export type Segment = { id?: string; name: string };
+
+export type PageVariant = {
+  id: string;
+  segments: Segment[];
+  blocks: PageBlock[];
+};
+
+export type PageVariantsData = {
+  page: {
+    id: string;
+    path: string;
+    variants: PageVariant[];
+  } | null;
+};
+
 export type PageSettings = {
   id?: string;
   navbar: Navbar | null;
@@ -68,6 +84,7 @@ export type Page = {
   path: string;
   seo: { id?: string; title: string; description: string | null } | null;
   settings: PageSettings | null;
+  variants: { id: string; segments: Segment[] }[];
   blocks: PageBlock[];
 };
 

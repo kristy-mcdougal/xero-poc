@@ -49,3 +49,19 @@ export function fieldAttrs(
   if (opts?.richText) attrs["data-hygraph-rich-text-format"] = opts.richText;
   return attrs;
 }
+
+/**
+ * Produce the `data-hygraph-*` attributes for the element that WRAPS a
+ * component instance inside an array (e.g. one block in a Page/Variant
+ * `blocks` list). Unlike {@link fieldAttrs} this does not tag a scalar field;
+ * it only marks the instance so the SDK can reorder it. The wrapper must be a
+ * direct child of the array container, which itself carries the array field
+ * via `fieldAttrs(root(entryId), "<arrayField>")`.
+ */
+export function chainAttrs(target: EditTarget | null): Record<string, string> {
+  if (!target) return {};
+  return createPreviewAttributes({
+    entryId: target.entryId,
+    componentChain: target.chain,
+  }) as unknown as Record<string, string>;
+}

@@ -14,6 +14,10 @@ import { blogPath, publicPath } from "@/lib/urls";
  *
  *   /preview/page/{id}            -> /{region}/{path}?preview=1
  *   /preview/post/{id}?locale=... -> /{region}/blog/{slug}?preview=1&locale=...
+ *   /preview/variant/{id}         -> /{region}/{parentPath}?preview=1&variant={id}
+ *
+ * Variants are not root-queryable, so we locate the parent page by the variant
+ * ids carried on each page and open the parent's URL with `&variant=`.
  */
 export async function GET(
   request: Request,
@@ -35,6 +39,13 @@ export async function GET(
         target = blogPath(region.pathPrefix, post.slug);
         break;
       }
+    } else if (kind === "variant") {
+      const pages = region.homePage ? [region.homePage, ...region.pages] : region.pages;
+      const page = pages.find((p) => p.variants?.some((v) => v.id === id));
+      if (page) {
+        target = publicPath(region.pathPrefix, page.path);
+        break;
+      }
     } else {
       const page =
         (region.homePage?.id === id ? region.homePage : null) ??
@@ -54,5 +65,6 @@ export async function GET(
 
   const qs = new URLSearchParams({ preview: "1" });
   if (locale) qs.set("locale", locale);
+  if (kind === "variant") qs.set("variant", id);
   return NextResponse.redirect(new URL(`${target}?${qs.toString()}`, base), 307);
 }

@@ -64,11 +64,26 @@ How fields map to edit targets:
   edits whichever source won resolution (page override → CtaRule → navbar →
   Site Settings).
 
+### Variant preview
+
+Page variants (alternate block layouts targeted at segments) are not addressable
+on their own, so they preview on their parent page's URL with the variant's
+blocks swapped in:
+
+- `?preview=1&variant={variantId}` renders that variant's `blocks` instead of
+  the page's, rooted at the variant entry. Click-to-edit targets every field on
+  the variant, and the `blocks` list is tagged as a reorderable component array
+  so dragging to reorder components updates live.
+- `/preview/variant/{variantId}` resolves the parent page and region
+  automatically, then redirects to the URL above. Use this as the Studio preview
+  template for the **PageVariant** model: `…/preview/variant/{id}`.
+
 ### One-time Studio setup
 
 1. **Schema → Preview URLs**: add a preview URL template such as
    `http://localhost:3002/{path}?preview=1&locale={locale}` (the `{locale}`
-   token enables the locale switcher).
+   token enables the locale switcher). For the **PageVariant** model, use
+   `http://localhost:3002/preview/variant/{id}`.
 2. **Schema → Sidebar**: add the **Preview** sidebar widget so the preview
    panel/iframe appears when editing an entry.
 

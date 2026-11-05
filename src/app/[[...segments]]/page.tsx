@@ -7,7 +7,7 @@ import { PromoBanner } from "@/components/PromoBanner";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { hygraphFetch } from "@/lib/hygraph";
-import { GET_SITE } from "@/lib/queries";
+import { GET_PAGE_VARIANTS, GET_SITE } from "@/lib/queries";
 import {
   brandingTarget,
   findPage,
@@ -20,7 +20,7 @@ import {
   resolveDiscountSource,
 } from "@/lib/resolve";
 import { fieldAttrs, root } from "@/lib/preview";
-import type { SiteData } from "@/lib/types";
+import type { PageVariant, PageVariantsData, SiteData } from "@/lib/types";
 import { parsePath, publicPath } from "@/lib/urls";
 
 type Search = { [key: string]: string | string[] | undefined };
@@ -74,6 +74,19 @@ export default async function CatchAllPage({
   const localeParam = typeof searchParams?.locale === "string" ? searchParams.locale : undefined;
   const locale = localeParam || region.contentLocale || "en";
 
+  // Variant preview: `?variant=<id>` swaps the page's blocks for a specific
+  // PageVariant's blocks, rooted at the variant so click-to-edit and reordering
+  // target the variant entry. Variants are only reachable via the parent page.
+  const variantParam = typeof searchParams?.variant === "string" ? searchParams.variant : undefined;
+  let variant: PageVariant | null = null;
+  if (variantParam && page?.id && isPreview(searchParams)) {
+    const data = await hygraphFetch<PageVariantsData>(GET_PAGE_VARIANTS, {
+      stage: "DRAFT",
+      id: page.id,
+    });
+    variant = data.page?.variants.find((v) => v.id === variantParam) ?? null;
+  }
+
   const post = rawPost ? localizedPost(rawPost, locale) : null;
   const { discount } = resolveDiscountSource(region, page, rawPost);
   const copyTarget = promoCopyTarget(discount);
@@ -101,6 +114,9 @@ export default async function CatchAllPage({
           { label: "Discount", value: discount ? `${discount.discountPercentage}% / ${discount.discountDurationInMonths} mo` : "none" },
           { label: "CTA source", value: `${cta.source}: ${cta.label}` },
           { label: "Stage", value: isPreview(searchParams) ? "DRAFT (preview)" : "PUBLISHED" },
+          ...(variant
+            ? [{ label: "Variant", value: variant.segments.map((s) => s.name).join(", ") || variant.id }]
+            : []),
         ]}
       />
       <main className="flex-1">
@@ -117,8 +133,8 @@ export default async function CatchAllPage({
           </article>
         ) : (
           <PageBlocks
-            blocks={page?.blocks ?? []}
-            pageId={page?.id}
+            blocks={variant ? variant.blocks : page?.blocks ?? []}
+            blocksEntryId={variant ? variant.id : page?.id}
             region={region}
             locale={locale}
             discount={discount}

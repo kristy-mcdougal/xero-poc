@@ -25,6 +25,20 @@ const NAVBAR = `
   items { id label page { path } blogPost { slug } }
 `;
 
+const BLOCKS = `
+  blocks {
+    __typename
+    ... on BasicTextBlock { id headline body }
+    ... on PlanBlock {
+      id
+      planColumns
+      disclaimer
+      plans { id title description baseMonthlyPrice }
+    }
+    ... on BlogPostList { id heading }
+  }
+`;
+
 const PAGE = `
   id
   slug
@@ -43,17 +57,8 @@ const PAGE = `
       blogPost { slug }
     }
   }
-  blocks {
-    __typename
-    ... on BasicTextBlock { id headline body }
-    ... on PlanBlock {
-      id
-      planColumns
-      disclaimer
-      plans { id title description baseMonthlyPrice }
-    }
-    ... on BlogPostList { id heading }
-  }
+  variants { id segments { id name } }
+  ${BLOCKS}
 `;
 
 export const GET_SITE = `
@@ -107,6 +112,25 @@ export const GET_SITE = `
           page { path }
           blogPost { slug }
         }
+      }
+    }
+  }
+`;
+
+/**
+ * Variants are not root-queryable in the Content API; they are reached through
+ * the parent page's `variants` reverse field. This fetches one page's variants
+ * (with full block data) so a specific variant can be rendered in preview.
+ */
+export const GET_PAGE_VARIANTS = `
+  query GetPageVariants($stage: Stage!, $id: ID!) {
+    page(stage: $stage, where: { id: $id }) {
+      id
+      path
+      variants {
+        id
+        segments { id name }
+        ${BLOCKS}
       }
     }
   }

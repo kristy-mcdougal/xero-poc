@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Xero POC — Regional model flexibility</title>
+  <style>
+    :root { color-scheme: light; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #1a365d;
+      background: #ffffff;
+      padding: 40px 24px;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    p.sub { margin: 0 0 24px; color: #4a5568; font-size: 14px; max-width: 70ch; }
+    .diagram { display: flex; justify-content: center; }
+    footer { margin-top: 28px; color: #718096; font-size: 12px; }
+    @media print { body { padding: 0; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Regional model flexibility</h1>
+    <p class="sub">
+      Specificity increases left to right. The most specific layer that sets a value wins;
+      anything not overridden falls back to the regional, then the base, default.
+    </p>
+    <div class="diagram">
+      <pre class="mermaid">
+graph LR
+  subgraph BASE["1 - Base - authored once, shared"]
+    direction TB
+    A1["Shared pages & posts<br/>home - pricing - blog - plans"]
+    A2["Global defaults<br/>CTA - branding - discount"]
+  end
+  subgraph REGION["2 - Regional - per region<br/>Global / AU / NZ / UK"]
+    direction TB
+    B1["Locale: en / en_GB"]
+    B2["Own navbar & footer"]
+    B3["Own discount %"]
+    B4["Which content is assigned"]
+  end
+  subgraph ONEOFF["3 - One-off - per-entry exceptions"]
+    direction TB
+    C1["Discount override<br/>e.g. 95% campaign"]
+    C2["CTA override<br/>e.g. one-off label"]
+    C3["Region-only page<br/>/uk/campaign/uk-only"]
+    C4["Excluded from a region<br/>global-excluded post"]
+  end
+  BASE ==>|region adjusts the defaults| REGION ==>|an entry can break the pattern| ONEOFF
+
+  classDef base fill:#e3f0ff,stroke:#2b6cb0,color:#1a365d;
+  classDef region fill:#e6f6ec,stroke:#2f855a,color:#22543d;
+  classDef oneoff fill:#fff4e0,stroke:#c05621,color:#7b341e;
+  class A1,A2 base;
+  class B1,B2,B3,B4 region;
+  class C1,C2,C3,C4 oneoff;
+      </pre>
+    </div>
+    <footer>Xero multi-site POC &middot; one base content set, per-region defaults, per-entry exceptions. Open in a browser, then Print &rarr; Save as PDF to export.</footer>
+  </div>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true, theme: "base", securityLevel: "loose" });
+  </script>
+</body>
+</html>
