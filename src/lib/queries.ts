@@ -25,6 +25,29 @@ const NAVBAR = `
   items { id label page { path } blogPost { slug } }
 `;
 
+const COMPARISON_TABLE = `
+  id
+  title
+  note
+  products(first: 20) { id name isPrimary }
+  featureGroups(first: 20) {
+    id
+    name
+    features(first: 100) {
+      id
+      name
+      description
+      support(first: 10) {
+        id
+        supportStatus
+        note
+        product { id name }
+        plans(first: 20) { id name }
+      }
+    }
+  }
+`;
+
 const BLOCKS = `
   blocks {
     __typename
@@ -36,6 +59,7 @@ const BLOCKS = `
       plans { id title description baseMonthlyPrice }
     }
     ... on BlogPostList { id heading }
+    ... on ComparisonBlock { id heading comparisonTable { ${COMPARISON_TABLE} } }
   }
 `;
 

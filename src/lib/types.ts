@@ -53,7 +53,45 @@ export type BlogPostListBlock = {
   heading: string | null;
 };
 
-export type PageBlock = BasicTextBlock | PlanBlock | BlogPostListBlock;
+export type FeatureStatus = "INCLUDED" | "PARTIAL" | "NOT_INCLUDED" | "ADD_ON";
+
+export type FeatureSupport = {
+  id?: string;
+  supportStatus: FeatureStatus | null;
+  note: string | null;
+  product: { id: string; name: string } | null;
+  plans: { id?: string; name: string }[];
+};
+
+export type Feature = {
+  id: string;
+  name: string;
+  description: string | null;
+  support: FeatureSupport[];
+};
+
+export type FeatureGroup = {
+  id?: string;
+  name: string;
+  features: Feature[];
+};
+
+export type ComparisonTable = {
+  id?: string;
+  title: string;
+  note: string | null;
+  products: { id: string; name: string; isPrimary: boolean | null }[];
+  featureGroups: FeatureGroup[];
+};
+
+export type ComparisonBlock = {
+  __typename: "ComparisonBlock";
+  id?: string;
+  heading: string | null;
+  comparisonTable: ComparisonTable | null;
+};
+
+export type PageBlock = BasicTextBlock | PlanBlock | BlogPostListBlock | ComparisonBlock;
 
 export type Segment = { id?: string; name: string };
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ComparisonTableView } from "@/components/ComparisonTableView";
 import { PlanCards } from "@/components/PlanCards";
 import { interpolateText, localizedPost } from "@/lib/resolve";
 import { chainAttrs, type EditTarget, fieldAttrs, into, root } from "@/lib/preview";
@@ -56,6 +57,9 @@ export function PageBlocks({
             )}
             {block.__typename === "BlogPostList" && (
               <BlogList heading={block.heading} target={blockTarget} region={region} locale={locale} />
+            )}
+            {block.__typename === "ComparisonBlock" && block.comparisonTable && (
+              <ComparisonTableView table={block.comparisonTable} heading={block.heading} />
             )}
           </div>
         );
