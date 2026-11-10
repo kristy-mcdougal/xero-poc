@@ -1,4 +1,4 @@
-import { chainAttrs, fieldAttrs, into, root } from "@/lib/preview";
+import { chainAttrs, type EditTarget, fieldAttrs, into, root } from "@/lib/preview";
 import type { ComparisonTable, FeatureStatus, FeatureSupport } from "@/lib/types";
 
 /**
@@ -6,23 +6,36 @@ import type { ComparisonTable, FeatureStatus, FeatureSupport } from "@/lib/types
  * (products as columns, feature groups/features as rows, one FeatureSupport
  * cell per product). Adding another competitor is a content change only.
  *
- * Click-to-edit is rooted at each Feature entry: the cell opens that feature's
- * Support component, the row label opens the feature name.
+ * Click-to-edit is spread across the entries that own each piece of text:
+ * - the block heading (or the table title it falls back to),
+ * - each product column name (the Product entry),
+ * - each feature row label and its per-product Support cell (the Feature entry),
+ * - the table note (the ComparisonTable entry).
  */
 export function ComparisonTableView({
   table,
   heading,
+  blockTarget,
 }: {
   table: ComparisonTable;
   heading?: string | null;
+  blockTarget?: EditTarget | null;
 }) {
   const products = table.products ?? [];
+  // The heading shown is the block's `heading`, falling back to the table
+  // `title`. Point click-to-edit at whichever entry actually owns that text.
+  const headingText = heading || table.title;
+  const headingTarget = heading ? blockTarget ?? null : root(table.id);
+  const headingField = heading ? "heading" : "title";
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-      {(heading || table.title) && (
-        <h2 className="mb-8 text-center text-3xl font-extrabold text-navy">
-          {heading || table.title}
+      {headingText && (
+        <h2
+          className="mb-8 text-center text-3xl font-extrabold text-navy"
+          {...fieldAttrs(headingTarget, headingField)}
+        >
+          {headingText}
         </h2>
       )}
 
@@ -42,6 +55,7 @@ export function ComparisonTableView({
                     className={`inline-block rounded-lg px-4 py-1.5 text-lg font-extrabold ${
                       p.isPrimary ? "bg-xero text-navy" : "text-navy"
                     }`}
+                    {...fieldAttrs(root(p.id), "name")}
                   >
                     {p.name}
                   </span>
@@ -89,7 +103,12 @@ export function ComparisonTableView({
       </div>
 
       {table.note && (
-        <p className="mt-4 text-center text-xs text-black/50">{table.note}</p>
+        <p
+          className="mt-4 text-center text-xs text-black/50"
+          {...fieldAttrs(root(table.id), "note")}
+        >
+          {table.note}
+        </p>
       )}
     </section>
   );

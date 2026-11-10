@@ -91,7 +91,26 @@ export type ComparisonBlock = {
   comparisonTable: ComparisonTable | null;
 };
 
-export type PageBlock = BasicTextBlock | PlanBlock | BlogPostListBlock | ComparisonBlock;
+export type HighlightItem = {
+  id?: string;
+  title: string;
+  description: string | null;
+};
+
+export type HighlightsBlock = {
+  __typename: "HighlightsBlock";
+  id?: string;
+  heading: string | null;
+  subheading: string | null;
+  items: HighlightItem[];
+};
+
+export type PageBlock =
+  | BasicTextBlock
+  | PlanBlock
+  | BlogPostListBlock
+  | ComparisonBlock
+  | HighlightsBlock;
 
 export type Segment = { id?: string; name: string };
 

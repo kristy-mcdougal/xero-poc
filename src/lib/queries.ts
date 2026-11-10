@@ -60,6 +60,7 @@ const BLOCKS = `
     }
     ... on BlogPostList { id heading }
     ... on ComparisonBlock { id heading comparisonTable { ${COMPARISON_TABLE} } }
+    ... on HighlightsBlock { id heading subheading items { id title description } }
   }
 `;
 
